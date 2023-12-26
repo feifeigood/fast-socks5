@@ -453,7 +453,10 @@ impl<S: AsyncRead + AsyncWrite + Unpin> Socks5Datagram<S> {
 
         // we don't know what our IP is from the perspective of the proxy, so
         // don't try to pass `addr` in here.
+        #[cfg(not(target_os = "ios"))]
         let client_src = TargetAddr::Ip("[::]:0".parse().unwrap());
+        #[cfg(target_os = "ios")]
+        let client_src = TargetAddr::Ip("0.0.0.0:0".parse().unwrap());
         let proxy_addr = proxy_stream
             .request(Socks5Command::UDPAssociate, client_src)
             .await?;
